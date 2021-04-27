@@ -443,8 +443,8 @@ int Convert::processLiDARData() {
          pktCount % (CIRCLE_ANGLE / (TASKFLOW_STEP_SIZE * 2 * m_iAngleSize /
                                      100 / m_iReturnBlockSize)))) {
       // ROS_WARN("pktCount[%d]", pktCount);
-      ROS_WARN("ts %lf cld size %u", timestamp,
-               outMsgArray[cursor]->points.size());
+      //ROS_WARN("ts %lf cld size %u", timestamp,
+      //         outMsgArray[cursor]->points.size());
 
       uint32_t startTick2 = GetTickCount();
       if (m_bPublishPointsFlag == false) {
@@ -630,8 +630,12 @@ void Convert::calcPointXYZIT(Pandar128Packet &pkt,
         pitch -= 360.0f;
       }
 
+      int pitchIndex = static_cast<int>(pitch * 100 + 0.5);
+      if (pitchIndex >= CIRCLE)
+        pitchIndex -= CIRCLE;
+
       float xyDistance =
-          distance * cos_all_angle_[static_cast<int>(pitch * 100 + 0.5)];
+          distance * cos_all_angle_[pitchIndex];
       azimuth += laserOffset.getAzimuthOffset(
           frame_id_, originAzimuth, block.fAzimuth / 100.0f, xyDistance);
 
@@ -644,7 +648,7 @@ void Convert::calcPointXYZIT(Pandar128Packet &pkt,
 
       point.x = xyDistance * sin_all_angle_[azimuthIdx];
       point.y = xyDistance * cos_all_angle_[azimuthIdx];
-      point.z = distance * sin_all_angle_[static_cast<int>(pitch * 100 + 0.5)];
+      point.z = distance * sin_all_angle_[pitchIndex];
 
       point.intensity = static_cast<float>(unit.u8Intensity) / 255.0f;
       point.timestamp =
