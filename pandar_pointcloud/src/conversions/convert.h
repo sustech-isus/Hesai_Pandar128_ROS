@@ -237,8 +237,8 @@ typedef struct PacketsBuffer_s {
   }
 
 } PacketsBuffer;
-
-typedef pandar_pointcloud::PointXYZIT PPoint;
+//TODO: Pointcloud Type
+typedef pandar_pointcloud::PointXYZITR PPoint;
 typedef pcl::PointCloud<PPoint> PPointCloud;
 
 namespace pandar_pointcloud {
