@@ -646,7 +646,7 @@ void Convert::calcPointXYZIT(Pandar128Packet &pkt,
       point.y = xyDistance * cos_all_angle_[azimuthIdx];
       point.z = distance * sin_all_angle_[static_cast<int>(pitch * 100 + 0.5)];
 
-      point.intensity = unit.u8Intensity;
+      point.intensity = static_cast<float>(unit.u8Intensity) / 255.0f;
       point.timestamp =
           unix_second + (static_cast<double>(pkt.tail.nTimestamp)) / 1000000.0;
 
