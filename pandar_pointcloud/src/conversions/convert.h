@@ -237,9 +237,10 @@ typedef struct PacketsBuffer_s {
   }
 
 } PacketsBuffer;
-//TODO: Pointcloud Type
-typedef pandar_pointcloud::PointXYZITR PPoint;
-typedef pcl::PointCloud<PPoint> PPointCloud;
+
+//TODO: Pointcloud Type, need test
+typedef pandar_pointcloud::PointXYZITR PPointITR;
+typedef pcl::PointCloud<PPointITR> PPointCloudITR;
 
 namespace pandar_pointcloud {
 class Convert {
@@ -263,7 +264,7 @@ class Convert {
 
   int parseData(Pandar128Packet &pkt, const uint8_t *buf, const int len);
   void calcPointXYZIT(Pandar128Packet &pkt,
-                      boost::shared_ptr<PPointCloud> &cld);
+                      boost::shared_ptr<PPointCloudITR> &cld);
   void doTaskFlow(int cursor);
   void loadOffsetFile(std::string file);
   int loadCorrectionFile(std::string correction_content);
@@ -301,7 +302,7 @@ class Convert {
   sem_t picsem;
   // std::list<pandar_msgs::PandarPacket> LiDARDataSet;
 
-  std::array<boost::shared_ptr<PPointCloud>, 2> outMsgArray;
+  std::array<boost::shared_ptr<PPointCloudITR>, 2> outMsgArray;
   PacketsBuffer lidar_packets_;
   double timestamp;
   int start_angle_;

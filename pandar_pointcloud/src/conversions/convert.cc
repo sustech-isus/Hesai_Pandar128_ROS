@@ -474,6 +474,7 @@ void Convert::publishPoints() {
   pcl_conversions::toPCL(ros::Time(timestamp),
                          outMsgArray[m_iPublishPointsIndex]->header.stamp);
   sensor_msgs::PointCloud2 output;
+
   pcl::toROSMsg(*outMsgArray[m_iPublishPointsIndex], output);
   output_.publish(output);
   m_bPublishPointsFlag = false;
@@ -532,9 +533,9 @@ int Convert::checkLiadaMode() {
     ROS_WARN("init mode: workermode: %x,return mode: %x,speed: %d",m_iWorkMode, m_iReturnMode, m_iMotorSpeed);
     changeAngleSize();
     changeReturnBlockSize();
-    boost::shared_ptr<PPointCloud> outMag0(new PPointCloud(
+    boost::shared_ptr<PPointCloudITR> outMag0(new PPointCloudITR(
         CIRCLE_ANGLE * 100 / m_iAngleSize * PANDAR128_LASER_NUM * m_iReturnBlockSize, 1));
-    boost::shared_ptr<PPointCloud> outMag1(new PPointCloud(
+    boost::shared_ptr<PPointCloudITR> outMag1(new PPointCloudITR(
         CIRCLE_ANGLE * 100 / m_iAngleSize * PANDAR128_LASER_NUM * m_iReturnBlockSize, 1));
     outMsgArray[0] = outMag0;
     outMsgArray[1] = outMag1;
@@ -587,7 +588,7 @@ void Convert::changeReturnBlockSize() {
 }
 
 void Convert::calcPointXYZIT(Pandar128Packet &pkt,
-                             boost::shared_ptr<PPointCloud> &cld) {
+                             boost::shared_ptr<PPointCloudITR> &cld) {
   // ROS_WARN("#####block.fAzimuth[%u][%u]",pkt.blocks[0].fAzimuth,pkt.blocks[1].fAzimuth);
   for (int blockid = 0; blockid < pkt.head.u8BlockNum; blockid++) {
     Pandar128Block &block = pkt.blocks[blockid];
@@ -609,7 +610,7 @@ void Convert::calcPointXYZIT(Pandar128Packet &pkt,
     for (int i = 0; i < pkt.head.u8LaserNum; i++) {
       /* for all the units in a block */
       Pandar128Unit &unit = block.units[i];
-      PPoint point;
+      PPointITR point;
 
       float distance =
           static_cast<float>(unit.u16Distance) * PANDAR128_DISTANCE_UNIT;
