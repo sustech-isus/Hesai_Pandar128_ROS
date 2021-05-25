@@ -602,8 +602,22 @@ void Convert::calcPointXYZIT(Pandar128Packet &pkt,
     t.tm_sec = pkt.tail.nUTCTime[5];
     t.tm_isdst = 0;
 
-    double unix_second = static_cast<double>(mktime(&t) + tz_second_);
 
+    // leap seconds should be subtracted.
+    double unix_second = static_cast<double>(mktime(&t) + tz_second_) - 37;
+
+    
+
+    // ROS_WARN("tail utc:  %d, %d,%d, %d, %d, %d, %f",
+    //   pkt.tail.nUTCTime[0],
+    //   pkt.tail.nUTCTime[1],
+    //   pkt.tail.nUTCTime[2],
+    //   pkt.tail.nUTCTime[3],
+    //   pkt.tail.nUTCTime[4],
+    //   pkt.tail.nUTCTime[5],
+    //   unix_second
+    //       );    
+          
     int mode = pkt.tail.nShutdownFlag & 0x03;
     int state = (pkt.tail.nShutdownFlag & 0xF0) >> 4;
 
@@ -653,13 +667,17 @@ void Convert::calcPointXYZIT(Pandar128Packet &pkt,
 
       point.intensity = static_cast<float>(unit.u8Intensity) / 255.0f;
       point.timestamp =
-          unix_second + (static_cast<double>(pkt.tail.nTimestamp)) / 1000000.0;
+          unix_second; // + (static_cast<double>(pkt.tail.nTimestamp)) / 1000000.0;
+      
+      // ROS_WARN("stamp:  %d, %d, %d, %d",unix_second, point.timestamp, offset,  laserOffset.getBlockTS(blockid, pkt.tail.nReturnMode, mode)
+      //     );
 
-      point.timestamp =
-          point.timestamp +
-          laserOffset.getBlockTS(blockid, pkt.tail.nReturnMode, mode) /
-              1000000000.0 +
-          offset / 1000000000.0;
+
+      // point.timestamp =
+      //     point.timestamp +
+      //     laserOffset.getBlockTS(blockid, pkt.tail.nReturnMode, mode) /
+      //         1000000000.0 +
+      //     offset / 1000000000.0;
 
       if (0 == timestamp) {
         timestamp = point.timestamp;
